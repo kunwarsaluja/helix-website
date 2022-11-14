@@ -1,6 +1,9 @@
 
-.section.video-tutorial, .section.instruction-tutorial
-{
+.section.video-tutorial, .section.instruction-tutorial{
     display : none;
+}
+
+.toggleview #video-based-learning{
+    float: left;
 }
 
