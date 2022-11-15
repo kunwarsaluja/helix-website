@@ -14,23 +14,10 @@
 
 .toggleview>ul>li {
     border: 1px solid var(--highlight-background-color);
-    background-color: var(--background-color)
-}
-
-.toggleview>div {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    max-width: 400px;
-
-}
-
-.toggleview>div>div {
-    border: 1px solid #ccc;
-
 }
 
 strong a {
-    background-color: rgb(82, 81, 81);
+    background-color: inherit;
     float: left;
     outline: none;
     cursor: pointer;
@@ -41,26 +28,30 @@ strong a {
     border-radius: 0;
 
 }
-a:focus{
-    background-color: black;
-}
-.section.video-tutorial, .section.instruction-tutorial{
-    display : none;
+
+.section.video-tutorial,
+.section.instruction-tutorial {
+    display: none;
 }
 
-.toggleview #video-based-learning{
+.toggleview #video-based-learning {
     float: left;
 }
+
+.toggleview #instruction-based-learning {
+    float: left;
+}
+
 div.section.video-tutorial {
     padding: 5px;
     border-style: ridge;
-    box-shadow: inset 0 3px 6px rgba(0,0,0,0.16), 0 4px 6px rgba(0,0,0,0.45);
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.16), 0 4px 6px rgba(0, 0, 0, 0.45);
     border-radius: 10px;
 }
 
 div.section.instruction-tutorial {
     padding: 5px;
     border-style: ridge;
-    box-shadow: inset 0 3px 6px rgba(0,0,0,0.16), 0 4px 6px rgba(0,0,0,0.45);
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.16), 0 4px 6px rgba(0, 0, 0, 0.45);
     border-radius: 10px;
 }
