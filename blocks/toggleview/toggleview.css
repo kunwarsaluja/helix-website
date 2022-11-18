@@ -1,9 +1,16 @@
+:root{
+    --videobg: #000;
+    --tutorialbg: #808080;
+    --active: #000;
+    --passive: #808080;
+}
+
 .section.video-tutorial{
     display: block;
 }
 
 .section.instruction-tutorial {
-    display: none;
+    display: none;    
 }
 
 .toggleview {
@@ -39,11 +46,13 @@ strong a {
 .toggleview #video-based-learning {
     float: left;
     border-top-left-radius: 10px;
+    background-color: var(--videobg);
 }
 
 .toggleview #instruction-based-learning {
     float: left;
     border-bottom-right-radius: 10px;
+    background-color: var(--tutorialbg);
 }
 
 div.section.video-tutorial {

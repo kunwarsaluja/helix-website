@@ -9,20 +9,20 @@ export default function decorate(block) {
   block.append(ul);
   const videoTutorial = document.getElementById('video-based-learning');
   const TextTutorial = document.getElementById('instruction-based-learning');
-  TextTutorial.style.backgroundColor = '#808080';
-  videoTutorial.style.backgroundColor = '#000000';
+  const root = document.querySelector(':root');
+  const rs = getComputedStyle(root);
   const videoTutorialSection = document.getElementsByClassName('video-tutorial')[0];
   const textTutorialSection = document.getElementsByClassName('instruction-tutorial')[0];
   videoTutorial.addEventListener('click', () => {
     videoTutorialSection.style.display = 'block';
     textTutorialSection.style.display = 'none';
-    videoTutorial.style.backgroundColor = '#000000';
-    TextTutorial.style.backgroundColor = '#808080';
+    root.style.setProperty('--videobg', rs.getPropertyValue('--active'));
+    root.style.setProperty('--tutorialbg', rs.getPropertyValue('--passive'));
   });
   TextTutorial.addEventListener('click', () => {
     videoTutorialSection.style.display = 'none';
     textTutorialSection.style.display = 'block';
-    TextTutorial.style.backgroundColor = '#000000';
-    videoTutorial.style.backgroundColor = '#808080';
+    root.style.setProperty('--videobg', rs.getPropertyValue('--passive'));
+    root.style.setProperty('--tutorialbg', rs.getPropertyValue('--active'));
   });
 }
