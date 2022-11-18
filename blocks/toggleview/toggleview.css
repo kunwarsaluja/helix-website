@@ -49,7 +49,7 @@ strong a {
     background-color: var(--videobg);
 }
 
-.toggleview #instruction-based-learning {
+.toggleview #text-based-learning {
     float: left;
     border-bottom-right-radius: 10px;
     background-color: var(--tutorialbg);

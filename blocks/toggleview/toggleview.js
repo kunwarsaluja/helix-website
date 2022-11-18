@@ -8,7 +8,7 @@ export default function decorate(block) {
   block.textContent = '';
   block.append(ul);
   const videoTutorial = document.getElementById('video-based-learning');
-  const TextTutorial = document.getElementById('instruction-based-learning');
+  const TextTutorial = document.getElementById('text-based-learning');
   const root = document.querySelector(':root');
   const rs = getComputedStyle(root);
   const videoTutorialSection = document.getElementsByClassName('video-tutorial')[0];
