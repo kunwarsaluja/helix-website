@@ -2,9 +2,10 @@
  * tabs - consonant v5.1
  * https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Tab_Role
  */
-import { createTag } from '../../scripts/utils/utils.js';
+import { createTag } from '../../scripts/scripts.js';
 
 function getStringKeyName(str) {
+    //console.log(str.trim().replaceAll(' ', '-').toLowerCase());
   return str.trim().replaceAll(' ', '-').toLowerCase();
 }
 
@@ -97,10 +98,17 @@ const init = (e) => {
   const tabListContainer = tabList.querySelector(':scope > div');
   tabListContainer.classList.add('tabList-container');
   const tabListItems = rows[0].querySelectorAll(':scope li');
+//console.log(tabListItems);
+  
+
   if (tabListItems) {
     let btnClass = [...e.classList].includes('quiet') ? 'heading-XS' : 'heading-XS';
     tabListItems.forEach((item, i) => {
-      const tabName = getStringKeyName(item.textContent);
+        item[i]='tab'+i;
+        console.log( item[i]);
+      //console.log(getStringKeyName(item.textContent));  
+      //const tabName = getStringKeyName(item.textContent);
+      const tabName = item[i];
       const tabBtnAttributes = {
         role: 'tab',
         class: btnClass,
@@ -146,17 +154,22 @@ const init = (e) => {
 
   // Tab Sections
   const allSections = Array.from(document.querySelectorAll('div.section'));
-  console.log(allSections)
-  allSections.forEach((e, i) => {
-    tabPos='tab'+i;
-    if(e.classList.contains('tab-'+i)){
-        e.removeAttribute('data-section-status');
-        e.remove();
-        tabContents.push(tabPos,e);
-        const assocTabItem = document.getElementById(`tab-panel-${initCount}-${tabPos}`);
-     if (assocTabItem) assocTabItem.append(e);
+allSections.forEach((e) => {
+    if(e.className.includes("tab-")){
+        console.log("inside");
+        tabContents.push(e);
     }
 
+});
+
+console.log("tab : "+tabContents);
+
+tabContents.forEach((e, i) => {
+    tabPos='tab'+i;
+    e.removeAttribute('data-section-status');
+    e.remove();
+    const assocTabItem = document.getElementById(`tab-panel-${initCount}-${tabPos}`);
+     if (assocTabItem) assocTabItem.append(e);
   });
   initTabs(e, config);
   initCount++;
