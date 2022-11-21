@@ -4,12 +4,7 @@
  */
 import { createTag } from '../../scripts/scripts.js';
 
-function getStringKeyName(str) {
-    //console.log(str.trim().replaceAll(' ', '-').toLowerCase());
-  return str.trim().replaceAll(' ', '-').toLowerCase();
-}
-
-function initTabs(e, config) {
+function initTabs(e) {
   const tabs = e.querySelectorAll('[role="tab"]');
   const tabLists = e.querySelectorAll('[role="tablist"]');
   tabLists.forEach( tabList => {
@@ -34,7 +29,6 @@ function initTabs(e, config) {
   tabs.forEach(tab => {
     tab.addEventListener("click", changeTabs);
   });
-  if(config) configTabs(config);
 }
 
 function changeTabs(e) {
@@ -52,14 +46,6 @@ function changeTabs(e) {
   grandparent.parentNode
     .querySelector(`#${target.getAttribute("aria-controls")}`)
     .removeAttribute("hidden");
-}
-
-function configTabs(config) {
-  if(config['active-tab']) {
-    const id = `tab-${config['tab-id']}-${getStringKeyName(config['active-tab'])}`;
-    const sel = document.getElementById(id);
-    if(sel) sel.click();
-  }
 }
 
 const isElementInContainerView = (targetEl) => {
@@ -105,7 +91,6 @@ const init = (e) => {
     let btnClass = [...e.classList].includes('quiet') ? 'heading-XS' : 'heading-XS';
     tabListItems.forEach((item, i) => {
         item[i]='tab'+i;
-        console.log( item[i]);
       //console.log(getStringKeyName(item.textContent));  
       //const tabName = getStringKeyName(item.textContent);
       const tabName = item[i];
@@ -136,19 +121,6 @@ const init = (e) => {
     tabListItems[0].parentElement.remove();
   }
 
-  // Tab Config
-  const config = { 'tab-id': initCount };
-  var configRows = [].slice.call(rows);
-  configRows.splice(0, 1);
-  if(configRows) {
-    configRows.forEach((row) => {
-      const rowKey = getStringKeyName(row.children[0].textContent);
-      const rowVal = row.children[1].textContent.trim();
-      config[rowKey] = rowVal;
-      row.remove();
-    });
-  }
-
   const tabContents=[];
   var tabPos='';
 
@@ -156,13 +128,10 @@ const init = (e) => {
   const allSections = Array.from(document.querySelectorAll('div.section'));
 allSections.forEach((e) => {
     if(e.className.includes("tab-")){
-        console.log("inside");
         tabContents.push(e);
     }
 
 });
-
-console.log("tab : "+tabContents);
 
 tabContents.forEach((e, i) => {
     tabPos='tab'+i;
@@ -171,7 +140,7 @@ tabContents.forEach((e, i) => {
     const assocTabItem = document.getElementById(`tab-panel-${initCount}-${tabPos}`);
      if (assocTabItem) assocTabItem.append(e);
   });
-  initTabs(e, config);
+  initTabs(e);
   initCount++;
 }
 
