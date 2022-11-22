@@ -72,8 +72,8 @@ const init = (e) => {
   if (!rows.length) return;
 
   // Tab Content
-  const tabContentContainer = createTag('div', { class: 'tabContent-container' });
-  const tabContent = createTag('div', { class: 'tabContent' }, tabContentContainer);
+  const tabContentContainer = createTag('div', { class: 'tabcontent-container' });
+  const tabContent = createTag('div', { class: 'tabcontent' }, tabContentContainer);
   e.append(tabContent);
 
   // Tab List
@@ -83,7 +83,7 @@ const init = (e) => {
   tabList.classList.add('tabList');
   tabList.setAttribute('role', 'tablist');
   const tabListContainer = tabList.querySelector(':scope > div');
-  tabListContainer.classList.add('tabList-container');
+  tabListContainer.classList.add('tablist-container');
   const tabListItems = rows[0].querySelectorAll(':scope li');
   if (tabListItems) {
     const btnClass = [...e.classList].includes('quiet') ? 'heading-XS' : 'heading-XS';
