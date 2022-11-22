@@ -5,7 +5,7 @@
     --tabs-border-hover-color: #acacac;
     --tabs-text-color: #7e7e7e;
     --tabs-active-text-color: #2C2C2C;
-    --tabs-bg-color: #f1f1f1;
+    --tabs-bg-color: rgb(250 250 250);
     --tabs-active-bg-color: #ffffff;
     --tabs-list-bg-gradient: linear-gradient(rgba(255,255,255,0) 60%, rgba(245,245,245,.8));
   }
@@ -21,9 +21,9 @@
   
   .tabs {
     position: relative;
-    margin: 0;
+    margin: 10px 0 0 0;
     color: var(--tabs-active-text-color);
-    background-color: var(--tabs-active-bg-color);
+    background-color: var(--tabs-bg-color);
   }
   
   .tabs.xxl-spacing {
@@ -86,9 +86,9 @@
   
   .tabs div[role="tablist"] .tabList-container {
     display: flex;
-    padding: 0 8.3%;
+   /*padding: 0 8.3%;*/
     width: var(--grid-container-width);
-    margin: 0 auto;
+    /*margin: 0 auto;*/
     box-sizing: content-box;
   }
   
@@ -109,8 +109,11 @@
   }
   
   .tabs .tabContent {
-    padding: var(--spacing-s) 0;
-    border-bottom: 1px solid var(--tabs-border-color)
+    padding: 0 10px;
+    border-bottom: 1px solid var(--tabs-border-color);
+    border-right: 1px solid var(--tabs-border-color);
+    border-left: 1px solid var(--tabs-border-color);
+    background-color: var(--tabs-active-bg-color);
   }
   
   /* contained tabs content */
@@ -118,6 +121,9 @@
   [role='tabpanel'] > .section > .content {
     width: var(--grid-container-width);
     margin: 0 auto;
+  }
+  .tabpanel .section{
+    padding:.5rem 0;
   }
   
   .tabs div[role="tablist"] button {
