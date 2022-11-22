@@ -79,7 +79,6 @@ export function loadCSS(href, callback) {
   }
 }
 
-
 export function createTag(tag, attributes, html) {
   const el = document.createElement(tag);
   if (html) {

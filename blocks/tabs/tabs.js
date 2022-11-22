@@ -4,57 +4,13 @@
  */
 import { createTag } from '../../scripts/scripts.js';
 
-function initTabs(e) {
-  const tabs = e.querySelectorAll('[role="tab"]');
-  const tabLists = e.querySelectorAll('[role="tablist"]');
-  tabLists.forEach( tabList => {
-    let tabFocus = 0;
-    tabList.addEventListener("keydown", (e) => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-        tabs[tabFocus].setAttribute("tabindex", -1);
-        if (e.key === 'ArrowRight') {
-          tabFocus++;
-          /* c8 ignore next */
-          if (tabFocus >= tabs.length) tabFocus = 0;
-        } else if (e.key === 'ArrowLeft') {
-          tabFocus--;
-          /* c8 ignore next */
-          if (tabFocus < 0) tabFocus = tabs.length - 1;
-        }
-        tabs[tabFocus].setAttribute("tabindex", 0);
-        tabs[tabFocus].focus();
-      }
-    });
-  });
-  tabs.forEach(tab => {
-    tab.addEventListener("click", changeTabs);
-  });
-}
-
-function changeTabs(e) {
-  const target = e.target;
-  const parent = target.parentNode;
-  const grandparent = parent.parentNode.nextElementSibling;
-  parent
-    .querySelectorAll('[aria-selected="true"]')
-    .forEach(t => t.setAttribute("aria-selected", false));
-  target.setAttribute("aria-selected", true);
-  scrollTabIntoView(target);
-  grandparent
-    .querySelectorAll('[role="tabpanel"]')
-    .forEach(p => p.setAttribute("hidden", true));
-  grandparent.parentNode
-    .querySelector(`#${target.getAttribute("aria-controls")}`)
-    .removeAttribute("hidden");
-}
-
 const isElementInContainerView = (targetEl) => {
   const rect = targetEl.getBoundingClientRect();
   return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || /* c8 ignore next */ document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || /* c8 ignore next */ document.documentElement.clientWidth)
+    rect.top >= 0
+    && rect.left >= 0
+    && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+    && rect.right <= (window.innerWidth || document.documentElement.clientWidth)
   );
 };
 
@@ -64,15 +20,60 @@ const scrollTabIntoView = (e) => {
   if (!isElInView) e.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 };
 
+function changeTabs(e) {
+  const { target } = e;
+  const parent = target.parentNode;
+  const grandparent = parent.parentNode.nextElementSibling;
+  parent
+    .querySelectorAll('[aria-selected="true"]')
+    .forEach((t) => t.setAttribute('aria-selected', false));
+  target.setAttribute('aria-selected', true);
+  scrollTabIntoView(target);
+  grandparent
+    .querySelectorAll('[role="tabpanel"]')
+    .forEach((p) => p.setAttribute('hidden', true));
+  grandparent.parentNode
+    .querySelector(`#${target.getAttribute('aria-controls')}`)
+    .removeAttribute('hidden');
+}
+
+function initTabs(e) {
+  const tabs = e.querySelectorAll('[role="tab"]');
+  const tabLists = e.querySelectorAll('[role="tablist"]');
+  tabLists.forEach((tabList) => {
+    let tabFocus = 0;
+    tabList.addEventListener('keydown', (p) => {
+      if (p.key === 'ArrowRight' || p.key === 'ArrowLeft') {
+        tabs[tabFocus].setAttribute('tabindex', -1);
+        if (p.key === 'ArrowRight') {
+          tabFocus += 1;
+          /* c8 ignore next */
+          if (tabFocus >= tabs.length) tabFocus = 0;
+        } else if (e.key === 'ArrowLeft') {
+          tabFocus -= 1;
+          /* c8 ignore next */
+          if (tabFocus < 0) tabFocus = tabs.length - 1;
+        }
+        tabs[tabFocus].setAttribute('tabindex', 0);
+        tabs[tabFocus].focus();
+      }
+    });
+  });
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', changeTabs);
+  });
+}
+
 let initCount = 0;
 const init = (e) => {
   const rows = e.querySelectorAll(':scope > div');
+  let tabPos = '';
   /* c8 ignore next */
-  if(!rows.length) return;
+  if (!rows.length) return;
 
   // Tab Content
-  const tabContentContainer = createTag('div', {class: 'tabContent-container'});
-  const tabContent = createTag('div', {class: 'tabContent'}, tabContentContainer);
+  const tabContentContainer = createTag('div', { class: 'tabContent-container' });
+  const tabContent = createTag('div', { class: 'tabContent' }, tabContentContainer);
   e.append(tabContent);
 
   // Tab List
@@ -84,15 +85,10 @@ const init = (e) => {
   const tabListContainer = tabList.querySelector(':scope > div');
   tabListContainer.classList.add('tabList-container');
   const tabListItems = rows[0].querySelectorAll(':scope li');
-//console.log(tabListItems);
-  
-
   if (tabListItems) {
-    let btnClass = [...e.classList].includes('quiet') ? 'heading-XS' : 'heading-XS';
+    const btnClass = [...e.classList].includes('quiet') ? 'heading-XS' : 'heading-XS';
     tabListItems.forEach((item, i) => {
-        item[i]='tab'+i;
-      //console.log(getStringKeyName(item.textContent));  
-      //const tabName = getStringKeyName(item.textContent);
+      item[i] = `tab${i}`;
       const tabName = item[i];
       const tabBtnAttributes = {
         role: 'tab',
@@ -115,33 +111,30 @@ const init = (e) => {
       };
       const tabListContent = createTag('div', tabContentAttributes);
       tabListContent.setAttribute('aria-labelledby', `tab-${initCount}-${tabName}`);
-      if(i > 0) tabListContent.setAttribute('hidden', '');
+      if (i > 0) tabListContent.setAttribute('hidden', '');
       tabContentContainer.append(tabListContent);
     });
     tabListItems[0].parentElement.remove();
   }
 
-  const tabContents=[];
-  var tabPos='';
+  const tabContents = [];
 
   // Tab Sections
   const allSections = Array.from(document.querySelectorAll('div.section'));
-allSections.forEach((e) => {
-    if(e.className.includes("tab-")){
-        tabContents.push(e);
+  allSections.forEach((x) => {
+    if (x.className.includes('tab-')) {
+      tabContents.push(x);
     }
+  });
 
-});
-
-tabContents.forEach((e, i) => {
-    tabPos='tab'+i;
-    e.removeAttribute('data-section-status');
-    e.remove();
+  tabContents.forEach((y, i) => {
+    tabPos = `tab${i}`;
+    y.removeAttribute('data-section-status');
+    y.remove();
     const assocTabItem = document.getElementById(`tab-panel-${initCount}-${tabPos}`);
-     if (assocTabItem) assocTabItem.append(e);
+    if (assocTabItem) assocTabItem.append(y);
   });
   initTabs(e);
-  initCount++;
-}
-
+  initCount += 1;
+};
 export default init;
