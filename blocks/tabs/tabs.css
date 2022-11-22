@@ -6,29 +6,24 @@
     --tabs-text-color: #7e7e7e;
     --tabs-active-text-color: #2C2C2C;
     --tabs-bg-color: #f1f1f1;
-    --tabs-active-bg-color: #fff;
-    --tabs-list-bg-gradient: linear-gradient(rgba(255,255,255,0%) 60%, rgba(245,245,245,80%));
+    --tabs-active-bg-color: #ffffff;
+    --tabs-list-bg-gradient: linear-gradient(rgba(255,255,255,0) 60%, rgba(245,245,245,.8));
   }
   
   :root .dark {
     --tabs-border-color: rgb(56,56,56);
     --tabs-text-color: #cdcdcd;
-    --tabs-active-text-color: #fff;
+    --tabs-active-text-color: #ffffff;
     --tabs-bg-color: #1a1a1a;
-    --tabs-active-bg-color: #111;
-    --tabs-list-bg-gradient: linear-gradient(rgba(0,0,0,0%) 60%, rgba(0,0,0,80%));
+    --tabs-active-bg-color: #111111;
+    --tabs-list-bg-gradient: linear-gradient(rgba(0,0,0,0) 60%, rgba(0,0,0,.8));
   }
   
   .tabs {
-    position: relative;    
+    position: relative;
+    margin: 0;
     color: var(--tabs-active-text-color);
     background-color: var(--tabs-active-bg-color);
-    border-style: ridge;
-    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 16%), 0 4px 6px rgba(0, 0, 0, 45%);
-    border-radius: 10px;
-    max-width: 1200px;
-    margin: auto;
-    display: block;
   }
   
   .tabs.xxl-spacing {
@@ -54,25 +49,26 @@
   .tabs div[role="tablist"] {
     position: relative;
     display: flex;
-    z-index: 2;    
+    z-index: 2;
+    /* ScrollProps */
+    /* If content exceeds height of container, overflow! */
     overflow: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
-    -ms-overflow-style: none; 
-    scrollbar-width: none;     
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none; /* Firefox 64 */
+    /*default bg*/
     background: var(--tabs-list-bg-gradient);
-    box-shadow: 0 -1px 0 inset var(--tabs-border-color);
   }
   
   .tabs div[role="tablist"]::-webkit-scrollbar {
-    display: none; 
+    display: none; /* Safari and Chrome */
   }
   
   .tabs .tab-headline {
     margin-top: var(--spacing-xxl);
     margin-bottom: var(--spacing-xl);
   }
-
   .tabs.center .tab-headline {
       text-align: center;
   }
@@ -93,10 +89,13 @@
     padding: 0 8.3%;
     width: var(--grid-container-width);
     margin: 0 auto;
-    margin-left: -100px;
     box-sizing: content-box;
   }
-    
+  
+  .tabs div[role="tablist"] {
+    box-shadow: 0 -1px 0 inset var(--tabs-border-color);
+  }
+  
   /* center tabs */
   .tabs.center div[role="tablist"]:after,
   .tabs.center div[role="tablist"]:before {
@@ -110,16 +109,10 @@
   }
   
   .tabs .tabContent {
-   border-bottom: 1px solid var(--tabs-border-color);  
-    
+    padding: var(--spacing-s) 0;
+    border-bottom: 1px solid var(--tabs-border-color)
   }
-
-  .tabs .tabContent p,h2 {
-    text-align: left; 
-    padding: 0;
-    margin-left: -100px;     
-   }
-
+  
   /* contained tabs content */
   .tabs.contained .tabContent .tabContent-container,
   [role='tabpanel'] > .section > .content {
