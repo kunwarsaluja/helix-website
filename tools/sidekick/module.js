@@ -999,7 +999,7 @@
       condition: (s) => s.config.innerHost && (s.isInner() || s.isDev()),
       button: {
         action: async (evt) => {
-          const { status, location } = sk;
+          const { status } = sk;
           if (status.edit && status.edit.sourceLocation
             && status.edit.sourceLocation.startsWith('onedrive:')) {
             // show ctrl/cmd + s hint on onedrive docs
@@ -1016,7 +1016,7 @@
               console.error(resp);
               throw new Error(resp);
             }
-            console.log(`reloading ${location.href}`);
+            console.log(`reloading ${window.location.href}`);
             if (newTab(evt)) {
               window.open(window.location.href);
               sk.hideModal();
@@ -1208,14 +1208,47 @@
             containerId,
             isContainer,
           } = cfg;
-          // check mandatory properties
-          let missingProperty = '';
-          if (!sk.get(id)) {
+          const condition = (s) => {
+            let excluded = false;
+            const pathSearchHash = location.href.replace(location.origin, '');
+            if (excludePaths && Array.isArray(excludePaths)
+              && excludePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
+              excluded = true;
+            }
+            if (includePaths && Array.isArray(includePaths)
+              && includePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
+              excluded = false;
+            }
+            if (excluded) {
+              // excluding plugin
+              return false;
+            }
+            if (!environments || environments.includes('any')) {
+              return true;
+            }
+            const envChecks = {
+              dev: s.isDev,
+              edit: s.isEditor,
+              preview: s.isInner,
+              live: s.isOuter,
+              prod: s.isProd,
+            };
+            return environments.some((env) => envChecks[env] && envChecks[env].call(s));
+          };
+          const existingPlugin = sk.get(id);
+          if (existingPlugin) {
+            // extend existing plugin
+            if (!condition(sk)) {
+              sk.remove(id);
+            }
+          } else {
+            // check mandatory properties
+            let missingProperty = '';
             // plugin config not extending existing plugin
             if (!title) {
               missingProperty = 'title';
             } else if (!(url || eventName || isContainer)) {
-              missingProperty = 'url, modalUrl, event, or isContainer';
+              missingProperty = 'url, event, or isContainer';
             }
             if (missingProperty) {
               console.log(`plugin config missing required property: ${missingProperty}`, cfg);
@@ -1225,33 +1258,7 @@
           // assemble plugin config
           const plugin = {
             id: id || `custom-plugin-${i}`,
-            condition: (s) => {
-              let excluded = false;
-              const pathSearchHash = location.href.replace(location.origin, '');
-              if (excludePaths && Array.isArray(excludePaths)
-                && excludePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
-                excluded = true;
-              }
-              if (includePaths && Array.isArray(includePaths)
-                && includePaths.some((glob) => globToRegExp(glob).test(pathSearchHash))) {
-                excluded = false;
-              }
-              if (excluded) {
-                // excluding plugin
-                return false;
-              }
-              if (!environments || environments.includes('any')) {
-                return true;
-              }
-              const envChecks = {
-                dev: s.isDev,
-                edit: s.isEditor,
-                preview: s.isInner,
-                live: s.isOuter,
-                prod: s.isProd,
-              };
-              return environments.some((env) => envChecks[env] && envChecks[env].call(s));
-            },
+            condition,
             button: {
               text: (titleI18n && titleI18n[language]) || title,
               action: () => {
@@ -1429,10 +1436,15 @@
       ...getAdminFetchOptions(sk.config),
     })
       .then(() => {
-        fireEvent(sk, 'loggedout');
-        window.location.reload();
+        delete sk.config.authToken;
+        sk.status = {
+          loggedOut: true,
+        };
       })
-      .catch(() => {
+      .then(() => fireEvent(sk, 'loggedout'))
+      .then(() => sk.fetchStatus())
+      .catch((e) => {
+        console.error('logout failed', e);
         sk.showModal({
           css: 'modal-logout-error',
           level: 0,
@@ -1448,13 +1460,18 @@
   function checkUserState(sk) {
     const toggle = sk.get('user').firstElementChild;
     toggle.removeAttribute('disabled');
-    const { profile } = sk.status;
-    if (profile) {
-      const { name, email, picture } = profile;
-      toggle.title = name;
-      // user picture
+    const updateUserPicture = async (picture) => {
       toggle.querySelectorAll('.user-picture').forEach((img) => img.remove());
       if (picture) {
+        if (picture.startsWith('https://admin.hlx.page/')) {
+          // fetch the image with auth token
+          const resp = await fetch(picture, {
+            headers: {
+              'x-auth-token': sk.config.authToken,
+            },
+          });
+          picture = URL.createObjectURL(await resp.blob());
+        }
         toggle.querySelector('.user-icon').classList.add('user-icon-hidden');
         appendTag(toggle, {
           tag: 'img',
@@ -1466,6 +1483,12 @@
       } else {
         toggle.querySelector('.user-icon').classList.remove('user-icon-hidden');
       }
+    };
+    const { profile } = sk.status;
+    if (profile) {
+      const { name, email, picture } = profile;
+      toggle.title = name;
+      updateUserPicture(picture);
       const info = sk.get('user-info');
       if (!info) {
         sk.add({
@@ -1522,16 +1545,19 @@
         },
       });
     } else {
-      // login
-      sk.add({
-        container: 'user',
-        id: 'user-login',
-        condition: (sidekick) => !sidekick.status.profile || !sidekick.isAuthenticated(),
-        button: {
-          action: () => login(sk),
-        },
-      });
-      if (!sk.isAuthenticated()) {
+      updateUserPicture();
+      if (!sk.get('user-login')) {
+        // login
+        sk.add({
+          container: 'user',
+          id: 'user-login',
+          condition: (sidekick) => !sidekick.status.profile || !sidekick.isAuthenticated(),
+          button: {
+            action: () => login(sk),
+          },
+        });
+      }
+      if (!sk.status.loggedOut && !sk.isAuthenticated()) {
         // // encourage login
         toggle.click();
         toggle.nextElementSibling.classList.add('highlight');
@@ -1829,7 +1855,7 @@
         addPublishPlugin(this);
         addUnpublishPlugin(this);
         addCustomPlugins(this);
-      });
+      }, { once: true });
       this.addEventListener('statusfetched', () => {
         checkUserState(this);
         checkPlugins(this);
@@ -2761,10 +2787,14 @@
         );
         // bust client cache for live and production
         if (config.outerHost) {
-          await fetch(`https://${config.outerHost}${path}`, { cache: 'reload', mode: 'no-cors' });
+          // reuse purgeURL to ensure page relative paths (e.g. when publishing dependencies)
+          purgeURL.hostname = config.outerHost;
+          await fetch(purgeURL.href, { cache: 'reload', mode: 'no-cors' });
         }
         if (config.host) {
-          await fetch(`https://${config.host}${path}`, { cache: 'reload', mode: 'no-cors' });
+          // reuse purgeURL to ensure page relative paths (e.g. when publishing dependencies)
+          purgeURL.hostname = config.host;
+          await fetch(purgeURL.href, { cache: 'reload', mode: 'no-cors' });
         }
         fireEvent(this, 'published', path);
       } catch (e) {
