@@ -2,6 +2,7 @@ main .banner-cta-container > div {
   max-width: 100%;
   padding: 0;
 }
+
 .banner-cta {
   position: relative;
   display: flex;
@@ -25,9 +26,9 @@ main .banner-cta-container > div {
 .banner-cta .foreground {
   position: relative;
   width: 100%;
-  padding: 0 15px;
+  padding: 10px 15px;
   border: 2px solid;
-  border-color: white;
+  border-color:  var( --spectrum-blue);
   border-radius: 25px;
 }
 
@@ -59,10 +60,12 @@ main .banner-cta-container > div {
   gap: 24px;
   flex-wrap: wrap;
 }
+
 .banner-cta a::before{
   content: "\A";
   white-space: pre;
 }
+
 .banner-cta a:any-link {
   font-size: 16px;
   letter-spacing: .16px;
@@ -76,6 +79,7 @@ main .banner-cta-container > div {
   padding-left: 0;
   text-decoration: none;
 }
+
 .banner-cta a::after {
   background-image: url('./../../img/external-arrow-purple.svg');
   content: "";
